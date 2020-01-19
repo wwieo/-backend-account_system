@@ -7,7 +7,7 @@ const {
     getUserByEmail
 } = require("./user_services");
 
-const { genSaltSync, hashSync, compareSync } = require("bcrypt");
+const { genSaltSync, bcrypt, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
 
 module.exports = {
