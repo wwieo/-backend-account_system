@@ -1,4 +1,4 @@
-const pool = require("../../config/database");
+const pool = require("./../db_set");
 
 module.exports = {
     create: (data, callback) => {
@@ -74,7 +74,7 @@ module.exports = {
                 if (error) {
                     return callback(error);
                 }
-                return callback(null, results);
+                return callback(null, results[0]);
             }
         );
     },
