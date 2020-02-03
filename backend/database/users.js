@@ -1,7 +1,7 @@
 const pool = require("./../db_set");
 
-module.exports = {
-    create: (data, callback) => {
+const create = data => {
+    return new Promise((resolve, reject) => {
         pool.query(
             'insert into registeration(name, user_name, email, password)\
             values(?,?,?,?)', [
@@ -11,13 +11,41 @@ module.exports = {
                 data.password
             ],
             (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
+                if (error) return reject(error);
+                else return resolve(results);
             }
         );
-    },
+    })
+}
+
+const getUserByUserName = user_name => {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            'select * from registeration where user_name=?', user_name,
+            (error, results, fields) => {
+                if (error) return reject(error);
+                else resolve(results[0]);
+            }
+        );
+    })
+}
+
+const getUserByEmail = email => {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            'select * from registeration where email=?', [email],
+            (error, results, fields) => {
+                if (error) return reject(error);
+                else return resolve(results[0]);
+            }
+        );
+    })
+}
+
+module.exports = {
+    create,
+    getUserByUserName,
+    getUserByEmail,
     getUsers: callback => {
         pool.query(
             'select id, name, user_name, email from registeration', [],
@@ -67,26 +95,5 @@ module.exports = {
             }
         );
     },
-    getUserByUserName: (user_name, callback) => {
-        pool.query(
-            'select * from registeration where user_name=?', [user_name],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results[0]);
-            }
-        );
-    },
-    getUserByEmail: (email, callback) => {
-        pool.query(
-            'select * from registeration where email=?', [email],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results[0]);
-            }
-        );
-    }
+
 };

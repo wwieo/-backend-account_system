@@ -11,21 +11,31 @@ const { return_rt } = require("./../controller/return_rt")
 const { sign } = require("jsonwebtoken");
 
 module.exports = {
-    createUser: (req, res) => {
+    createUser: async function(req, res) {
         const body = req.body;
         const salt = genSaltSync(10);
-        body.password = hashSync(body.password, salt);
-        create(body, (err, results) => {
-            if (body.name == undefined || body.user_name == undefined ||
-                body.email == undefined || body.password == undefined)
-                return return_rt(res, 0, "some inputs are none");
+        if (body.name == undefined || body.user_name == undefined ||
+            body.email == undefined || body.password == undefined)
+            return return_rt(res, 0, "some inputs are none");
 
-            if (err) {
-                console.log(err);
+        body.password = hashSync(body.password, salt);
+
+        const userName = await getUserByUserName(body.user_name);
+        const userEmail = await getUserByEmail(body.email);
+        if (userName) return return_rt(res, 0, "someone has registered this user_name");
+        if (userEmail) return return_rt(res, 0, "someone has registered this email");
+
+        await create(body)
+            .then((body) => {
+                return return_rt(res, 1, body);
+            })
+            .catch((body) => {
+                console.log(body);
                 return return_rt(res, 0, "Database connection error");
-            }
-            return return_rt(res, 1, results);
-        });
+            });
+
+        //username len>3
+        //password len>5   
     },
     updateUser: (req, res) => {
         const body = req.body;
