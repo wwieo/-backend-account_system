@@ -21,7 +21,7 @@ const create = data => {
 const getUserByUserName = user_name => {
     return new Promise((resolve, reject) => {
         pool.query(
-            'select * from registeration where user_name=?', user_name,
+            'select * from registeration where user_name=?', [user_name],
             (error, results, fields) => {
                 if (error) return reject(error);
                 else resolve(results[0]);
@@ -42,32 +42,22 @@ const getUserByEmail = email => {
     })
 }
 
+const getUsers = () => {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            'select id, name, user_name, email from registeration', [],
+            (error, results, fields) => {
+                if (error) return reject(error);
+                else return resolve(results);
+            }
+        );
+    })
+}
 module.exports = {
     create,
     getUserByUserName,
     getUserByEmail,
-    getUsers: callback => {
-        pool.query(
-            'select id, name, user_name, email from registeration', [],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
-    getUserById: (id, callback) => {
-        pool.query(
-            'select id, name, user_name, email from registeration where id=?', [id],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results[0]);
-            }
-        );
-    },
+    getUsers,
     updateUser: (data, callback) => {
         pool.query(
             'update registeration set name=?, user_name=?, email=?, password=? where id=?', [data.name,
@@ -95,5 +85,4 @@ module.exports = {
             }
         );
     },
-
 };

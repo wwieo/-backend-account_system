@@ -3,7 +3,6 @@ const {
     updateUser,
     getUsers,
     getUserByEmail,
-    getUserById,
     getUserByUserName
 } = require("../database/users");
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
@@ -17,6 +16,9 @@ module.exports = {
         if (body.name == undefined || body.user_name == undefined ||
             body.email == undefined || body.password == undefined)
             return return_rt(res, 0, "some inputs are none");
+
+        if (body.user_name.length <= 3) return return_rt(res, 0, "user_name's length need be more than 3");
+        if (body.password.length <= 5) return return_rt(res, 0, "password's length need be more than 5");
 
         body.password = hashSync(body.password, salt);
 
@@ -33,9 +35,6 @@ module.exports = {
                 console.log(body);
                 return return_rt(res, 0, "Database connection error");
             });
-
-        //username len>3
-        //password len>5   
     },
     updateUser: (req, res) => {
         const body = req.body;
@@ -53,25 +52,26 @@ module.exports = {
         });
     },
     getUsers: (req, res) => {
-        getUsers((err, results) => {
-            if (err) {
-                console.log(err);
-                return return_rt(res, 0, "Something gets error");
-            }
-            return return_rt(res, 1, results);
-        });
+        getUsers()
+            .then((results) => {
+                return return_rt(res, 1, results);
+            })
+            .catch((results) => {
+                console.log(results);
+                return return_rt(res, 0, "Database connection error");
+            });
     },
-    getUserById: (req, res) => {
-        const id = req.params.id;
-        getUserById(id, (err, results) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            if (!results)
-                return return_rt(res, 0, "No user record");
-            return return_rt(res, 1, results);
-        })
+    getUserByUserName: (req, res) => {
+        const user_name = req.params.user_name;
+        getUserByUserName(user_name)
+            .then((results) => {
+                if (results) return return_rt(res, 1, results);
+                else return return_rt(res, 0, "No user record");
+            })
+            .catch((results) => {
+                console.log(results);
+                return return_rt(res, 0, "getUserByUserName api error");
+            })
     },
     login: (req, res) => {
         let body = req.body;
