@@ -1,6 +1,7 @@
 const {
     create,
     updateUser,
+    updateUserPassword,
     getUsers,
     getUserByEmail,
     getUserByUserName
@@ -36,20 +37,49 @@ module.exports = {
                 return return_rt(res, 0, "Database connection error");
             });
     },
-    updateUser: (req, res) => {
+    updateUser: async function(req, res) {
+        const body = req.body;
+
+        if (body.user_name == undefined) return return_rt(res, 0, "Need to input user_name");
+        const userName = await getUserByUserName(body.user_name);
+        if (!userName) return return_rt(res, 0, "No user record");
+        if (body.name == undefined) body.name = userName.name;
+        if (body.email == undefined) body.email = userName.email;
+        const userEmail = await getUserByEmail(body.email);
+        if (userEmail) return return_rt(res, 0, "Someone has registered this email");
+        await updateUser(body)
+            .then(() => {
+                return return_rt(res, 1, "Updated successfully");
+            })
+            .catch((results) => {
+                console.log(results);
+                return return_rt(res, 0, "Updated failed");
+            });
+    },
+    updateUserPassword: async function(req, res) {
         const body = req.body;
         const salt = genSaltSync(10);
-        body.password = hashSync(body.password, salt);
 
-        updateUser(body, (err, results) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            if (!results)
-                return return_rt(res, 0, "Updated failed");
-            return return_rt(res, 1, "Updated successfully");
-        });
+        if (body.old_password == undefined ||
+            body.new_password == undefined ||
+            body.user_name == undefined)
+            return return_rt(res, 0, "Some inputs are none");
+
+        const userName = await getUserByUserName(body.user_name);
+        const result = await compareSync(body.old_password, userName.password);
+        if (!result) return return_rt(res, 0, "Old password is different");
+        else {
+            if (body.new_password.length <= 5) return return_rt(res, 0, "new_password's length need be more than 5");
+            body.new_password = hashSync(body.new_password, salt);
+            await updateUserPassword(body)
+                .then(() => {
+                    return return_rt(res, 1, "Updated password successfully");
+                })
+                .catch((results) => {
+                    console.log(results);
+                    return return_rt(res, 0, "Updated password failed");
+                });
+        }
     },
     getUsers: (req, res) => {
         getUsers()
@@ -73,38 +103,25 @@ module.exports = {
                 return return_rt(res, 0, "getUserByUserName api error");
             })
     },
-    login: (req, res) => {
+    login: async function(req, res) {
         let body = req.body;
-        if (body.email != undefined) {
-            getUserByEmail(body.email, (err, results) => {
-                check(body, err, results, res);
+        let login = await getUserByUserName(body.user_name);
+        if (!login) login = await getUserByEmail(body.email);
+        if (!login) return return_rt(res, 0, "user_name and email are none or no user record");
+        if (body.password == undefined) return return_rt(res, 0, "Password input is none");
+
+        const result = compareSync(body.password, login.password);
+        if (!result) return return_rt(res, 0, "invalid password");
+        else {
+            login.password = undefined;
+            const jsontoken = sign({ result: login }, "qwe1234", {
+                expiresIn: "1h"
             });
-        } else {
-            getUserByUserName(body.user_name, (err, results) => {
-                check(body, err, results, res);
+            return res.json({
+                success: 1,
+                message: "login successfully",
+                token: jsontoken
             });
         }
     }
-}
-
-function check(body, err, results, res) {
-    if (err)
-        console.log(err);
-    if (!results)
-        return return_rt(res, 0, "invalid email, username or password");
-
-    const result = compareSync(body.password, results.password);
-    if (result) {
-        results.password = undefined;
-        const jsontoken = sign({ result: results }, "qwe1234", {
-            expiresIn: "1h"
-        });
-        return res.json({
-            success: 1,
-            message: "login successfully",
-            token: jsontoken
-        });
-    } else
-        return return_rt(res, 0, "invalid email, username or password");
-
 }

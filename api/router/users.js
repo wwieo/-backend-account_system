@@ -1,6 +1,7 @@
 const {
     createUser,
     updateUser,
+    updateUserPassword,
     getUsers,
     getUserByUserName,
     login
@@ -15,8 +16,7 @@ router.get("/:user_name", getUserByUserName);
 router.post("/", createUser);
 router.post("/login", login)
 
-router.put("/", checktoken, updateUser);
-
-
+router.put("/", updateUser);
+router.put("/pw", updateUserPassword);
 
 module.exports = router;

@@ -24,7 +24,7 @@ const getUserByUserName = user_name => {
             'select * from registeration where user_name=?', [user_name],
             (error, results, fields) => {
                 if (error) return reject(error);
-                else resolve(results[0]);
+                else return resolve(results[0]);
             }
         );
     })
@@ -53,36 +53,54 @@ const getUsers = () => {
         );
     })
 }
+
+const updateUser = data => {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            'update registeration set name=?, email=? where user_name=?', [data.name,
+                data.email,
+                data.user_name
+            ],
+            (error, results, fields) => {
+                if (error) return reject(error);
+                else return resolve(results);
+            }
+        );
+    })
+}
+
+const updateUserPassword = data => {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            'update registeration set password=? where user_name=?', [data.new_password,
+                data.user_name
+            ],
+            (error, results, fields) => {
+                if (error) return reject(error);
+                else return resolve(results);
+            }
+        );
+    })
+}
+
+const deleteUserById = id => {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            'delete from registeration where id=?', [data.id],
+            (error, results, fields) => {
+                if (error) return reject(error);
+                else return resolve(results);
+            }
+        );
+    })
+}
+
 module.exports = {
     create,
     getUserByUserName,
     getUserByEmail,
     getUsers,
-    updateUser: (data, callback) => {
-        pool.query(
-            'update registeration set name=?, user_name=?, email=?, password=? where id=?', [data.name,
-                data.user_name,
-                data.email,
-                data.password,
-                data.id
-            ],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
-    deleteUser: (data, callback) => {
-        pool.query(
-            'delete from registeration where id=?', [data.id],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results[0]);
-            }
-        );
-    },
+    updateUser,
+    updateUserPassword,
+    deleteUserById
 };
