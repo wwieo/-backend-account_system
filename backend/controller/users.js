@@ -18,8 +18,8 @@ module.exports = {
             body.email == undefined || body.password == undefined)
             return return_rt(res, 0, "some inputs are none");
 
-        if (body.user_name.length <= 3) return return_rt(res, 0, "user_name's length need be more than 3");
-        if (body.password.length <= 5) return return_rt(res, 0, "password's length need be more than 5");
+        const CheckLength = checkLength(res, body);
+        if (CheckLength) return CheckLength;
 
         body.password = hashSync(body.password, salt);
 
@@ -41,12 +41,18 @@ module.exports = {
         const body = req.body;
 
         if (body.user_name == undefined) return return_rt(res, 0, "Need to input user_name");
+
         const userName = await getUserByUserName(body.user_name);
         if (!userName) return return_rt(res, 0, "No user record");
         if (body.name == undefined) body.name = userName.name;
         if (body.email == undefined) body.email = userName.email;
+
         const userEmail = await getUserByEmail(body.email);
         if (userEmail) return return_rt(res, 0, "Someone has registered this email");
+
+        const CheckLength = checkLength(res, body);
+        if (CheckLength) return CheckLength;
+
         await updateUser(body)
             .then(() => {
                 return return_rt(res, 1, "Updated successfully");
@@ -69,7 +75,7 @@ module.exports = {
         const result = await compareSync(body.old_password, userName.password);
         if (!result) return return_rt(res, 0, "Old password is different");
         else {
-            if (body.new_password.length <= 5) return return_rt(res, 0, "new_password's length need be more than 5");
+            if (body.new_password.length <= 5 || body.new_password == "") return return_rt(res, 0, "new_password's length need be more than 5");
             body.new_password = hashSync(body.new_password, salt);
             await updateUserPassword(body)
                 .then(() => {
@@ -124,4 +130,20 @@ module.exports = {
             });
         }
     }
+}
+
+function checkLength(res, body) {
+    if (body.name || body.name == "") {
+        if (body.name.length < 1 || body.name == "") return return_rt(res, 0, "user_name's length need be more than 0");
+        else if (body.name.length > 12) return return_rt(res, 0, "user_name's length need be less than 12");
+    }
+    if (body.user_name || body.user_name == "") {
+        if (body.user_name.length <= 3 || body.user_name == "") return return_rt(res, 0, "user_name's length need be more than 3");
+        else if (body.user_name.length > 12) return return_rt(res, 0, "user_name's length need be less than 12");
+    }
+    if (body.password || body.password == "") {
+        if (body.password.length <= 5 || body.password == "") return return_rt(res, 0, "password's length need be more than 5");
+        else if (body.password.length > 12) return return_rt(res, 0, "password's length need be less than 12");
+    }
+    return 0;
 }
