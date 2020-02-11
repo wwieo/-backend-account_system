@@ -1,4 +1,4 @@
-const pool = require("./../db_set");
+const pool = require("../../model/index.js");
 
 const create = data => {
     return new Promise((resolve, reject) => {

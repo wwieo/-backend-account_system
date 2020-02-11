@@ -126,6 +126,9 @@ module.exports = {
             return res.json({
                 success: 1,
                 message: "login successfully",
+                user_name: login.user_name,
+                name: login.name,
+                email: login.email,
                 token: jsontoken
             });
         }
