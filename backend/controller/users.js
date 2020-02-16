@@ -4,7 +4,8 @@ const {
     updateUserPassword,
     getUsers,
     getUserByEmail,
-    getUserByUserName
+    getUserByUserName,
+    getUserById
 } = require("../database/users");
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { return_rt } = require("./../controller/return_rt")
@@ -30,7 +31,11 @@ module.exports = {
 
         await create(body)
             .then((body) => {
-                return return_rt(res, 1, body);
+                return return_rt(res, 1, {
+                    "email": body.email,
+                    "name": body.name,
+                    "user_name": body.user_name
+                });
             })
             .catch((body) => {
                 console.log(body);
@@ -70,9 +75,9 @@ module.exports = {
             body.new_password == undefined ||
             body.user_name == undefined)
             return return_rt(res, 0, "Some inputs are none");
-
         const userName = await getUserByUserName(body.user_name);
-        const result = await compareSync(body.old_password, userName.password);
+        const userId = await getUserById(userName.id);
+        const result = await compareSync(body.old_password, userId.password);
         if (!result) return return_rt(res, 0, "Old password is different");
         else {
             if (body.new_password.length <= 5 || body.new_password == "") return return_rt(res, 0, "new_password's length need be more than 5");
@@ -111,16 +116,18 @@ module.exports = {
     },
     login: async function(req, res) {
         let body = req.body;
-        let login = await getUserByUserName(body.user_name);
-        if (!login) login = await getUserByEmail(body.email);
+        let login = undefined;
+        if (body.user_name != undefined) login = await getUserByUserName(body.user_name);
+        if (!login && body.email != undefined) login = await getUserByEmail(body.email);
         if (!login) return return_rt(res, 0, "user_name and email are none or no user record");
-        if (body.password == undefined) return return_rt(res, 0, "Password input is none");
+        if (body.password == undefined || body.password == "") return return_rt(res, 0, "Password input is none");
 
-        const result = compareSync(body.password, login.password);
+        const userId = await getUserById(login.id);
+        const result = compareSync(body.password, userId.password);
         if (!result) return return_rt(res, 0, "invalid password");
         else {
-            login.password = undefined;
-            const jsontoken = sign({ result: login }, "qwe1234", {
+            userId.password = undefined;
+            const jsontoken = sign({ result: userId }, "qwe1234", {
                 expiresIn: "1h"
             });
             return res.json({

@@ -5,4 +5,4 @@ const return_rt = (res, success, message) => {
     });
 }
 
-module.exports = { return_rt }
+module.exports = { return_rt };
