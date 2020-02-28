@@ -14,7 +14,7 @@ const config = {
 
 function isInTest() {
     var isInTest = typeof global.it === 'function';
-    if (isInTest) return MYSQL_DB = "systemPracticeTest";
+    if (!isInTest) return MYSQL_DB = "systemPracticeTest";
     else return MYSQL_DB = "systemPractice";
 }
 

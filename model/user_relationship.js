@@ -1,18 +1,14 @@
 module.exports = function(sequelize, DataTypes) {
-    return sequelize.define('registeration', {
-        name: {
-            type: DataTypes.STRING(255),
+    return sequelize.define("user_relationship", {
+        sender_id: {
+            type: DataTypes.INTEGER(),
             allowNull: false
         },
-        user_name: {
-            type: DataTypes.STRING(255),
+        receiver_id: {
+            type: DataTypes.INTEGER(),
             allowNull: false
         },
-        email: {
-            type: DataTypes.STRING(255),
-            allowNull: false
-        },
-        password: {
+        status: {
             type: DataTypes.STRING(255),
             allowNull: false
         }

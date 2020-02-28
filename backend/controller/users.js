@@ -28,13 +28,12 @@ module.exports = {
         const userEmail = await getUserByEmail(body.email);
         if (userName) return return_rt(res, 0, "someone has registered this user_name");
         if (userEmail) return return_rt(res, 0, "someone has registered this email");
-
         await create(body)
             .then((body) => {
                 return return_rt(res, 1, {
                     "email": body.email,
                     "name": body.name,
-                    "user_name": body.user_name
+                    "user_name": body.user_name,
                 });
             })
             .catch((body) => {

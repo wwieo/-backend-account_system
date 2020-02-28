@@ -9,6 +9,7 @@ const create = data => {
             password: data.password
         }, {
             attributes: [
+                "id",
                 "name",
                 "user_name",
                 "email"
@@ -79,6 +80,7 @@ const getUsers = () => {
     return new Promise((resolve, reject) => {
         pool.registeration.findAll({
                 attributes: [
+                    "id",
                     "name",
                     "user_name",
                     "email"
