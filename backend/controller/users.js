@@ -75,6 +75,7 @@ module.exports = {
             body.user_name == undefined)
             return return_rt(res, 0, "Some inputs are none");
         const userName = await getUserByUserName(body.user_name);
+        if (!userName) return return_rt(res, 0, "No user record");
         const userId = await getUserById(userName.id);
         const result = await compareSync(body.old_password, userId.password);
         if (!result) return return_rt(res, 0, "Old password is different");

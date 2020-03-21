@@ -43,6 +43,21 @@ describe('updateUserPassword', async() => {
                 done();
             });
     });
+    await it('No User Record', (done) => {
+        chai.request(app)
+            .put('/api/users/pw')
+            .set('Authorization', 'Bearer ' + token)
+            .send({
+                "user_name": "upUserNoUserRecord",
+                "old_password": "upUserPW",
+                "new_password": "12345"
+            })
+            .end((err, res) => {
+                if (err) console.log(err);
+                expect(res.body).to.deep.equal({ success: 0, results: "No user record" });
+                done();
+            });
+    });
     await it('Input Undefined', (done) => {
         chai.request(app)
             .put('/api/users/pw')

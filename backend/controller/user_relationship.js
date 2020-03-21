@@ -2,7 +2,10 @@ const {
     checkRelationship,
     exactCheckRelationship,
     friendRequest,
-    replyFriend
+    replyFriend,
+    unfriend,
+    createBlockUser,
+    updateBlockUser
 } = require("../database/user_relationship");
 const {
     getUserById
@@ -13,6 +16,7 @@ const { return_rt } = require("./../controller/return_rt")
 //unfriend
 //unchecked_friend
 //block
+//unblock
 
 module.exports = {
     checkRelationship: async function(req, res) {
@@ -21,8 +25,10 @@ module.exports = {
         if (body.user1_id == undefined || body.user2_id == undefined)
             return return_rt(res, 0, "some inputs are none");
 
-        if (!checkUserExist(res, body.user1_id)) return checkUserExist(body.user1_id);
-        if (!checkUserExist(res, body.user2_id)) return checkUserExist(body.user2_id);
+        const user1 = await getUserById(body.user1_id);
+        const user2 = await getUserById(body.user2_id);
+        if (!user1) return return_rt(res, 0, "user_id " + body.user1_id + " is not exist");
+        if (!user2) return return_rt(res, 0, "user_id " + body.user2_id + " is not exist");
 
         await checkRelationship(body)
             .then((results) => {
@@ -38,18 +44,24 @@ module.exports = {
         if (body.sender_id == undefined || body.receiver_id == undefined)
             return return_rt(res, 0, "some inputs are none");
 
-        if (!checkUserExist(res, body.sender_id)) return checkUserExist(body.sender_id);
-        if (!checkUserExist(res, body.receiver_id)) return checkUserExist(body.receiver_id);
+        const user1 = await getUserById(body.sender_id);
+        const user2 = await getUserById(body.receiver_id);
+        if (!user1) return return_rt(res, 0, "user_id " + body.sender_id + " is not exist");
+        if (!user2) return return_rt(res, 0, "user_id " + body.receiver_id + " is not exist");
 
         const request = await exactCheckRelationship(body);
 
-        if (request.status == "friend") {
-            return_rt(res, 0, "they're already friend");
-        } else if (request.status == "block") {
-            return_rt(res, 0, "receiver has been blocked by sender");
-        } else if (request.status == "unchecked_friend") {
-            return_rt(res, 0, "sender has been sent the request");
-        } else {
+        try {
+            if (request.status == "friend") {
+                return_rt(res, 0, "they're already friend");
+            } else if (request.status == "block") {
+                return_rt(res, 0, "receiver has been blocked by sender");
+            } else if (request.status == "unchecked_friend") {
+                return_rt(res, 0, "sender has been sent the request");
+            } else {
+                return_rt(res, 0, "unknown status");
+            }
+        } catch {
             await friendRequest(body)
                 .then((body) => {
                     return return_rt(res, 1, {
@@ -70,8 +82,10 @@ module.exports = {
         if (body.sender_id == undefined || body.receiver_id == undefined)
             return return_rt(res, 0, "some inputs are none");
 
-        if (!checkUserExist(res, body.sender_id)) return checkUserExist(body.sender_id);
-        if (!checkUserExist(res, body.receiver_id)) return checkUserExist(body.receiver_id);
+        const user1 = await getUserById(body.sender_id);
+        const user2 = await getUserById(body.receiver_id);
+        if (!user1) return return_rt(res, 0, "user_id " + body.sender_id + " is not exist");
+        if (!user2) return return_rt(res, 0, "user_id " + body.receiver_id + " is not exist");
 
         const request = await exactCheckRelationship(body);
         if (!request) return return_rt(res, 0, "sender didn't send the request");
@@ -83,7 +97,7 @@ module.exports = {
                     return return_rt(res, 1, {
                         "sender_id": body.sender_id,
                         "receiver_id": body.receiver_id,
-                        "status": body.status
+                        "status": "friend"
                     });
                 })
                 .catch((body) => {
@@ -93,11 +107,70 @@ module.exports = {
         } else {
             return return_rt(res, 0, "status need to be unchecked_friend");
         }
-    }
-}
+    },
+    unfriend: async function(req, res) {
+        const body = req.body;
 
-async function checkUserExist(res, user_id) {
-    const user = await getUserById(user_id);
-    if (!user) return return_rt(res, 0, "user_id " + user_id + " is not exist");
-    return 0;
+        if (body.user1_id == undefined || body.user2_id == undefined)
+            return return_rt(res, 0, "some inputs are none");
+
+        const user1 = await getUserById(body.user1_id);
+        const user2 = await getUserById(body.user2_id);
+        if (!user1) return return_rt(res, 0, "user_id " + body.user1_id + " is not exist");
+        if (!user2) return return_rt(res, 0, "user_id " + body.user2_id + " is not exist");
+
+        const request = await checkRelationship(body);
+        if (!request) return return_rt(res, 0, "they don't have relationship");
+
+        const status = request.status;
+        if (status != "friend") return return_rt(res, 0, "their relationship is not friend");
+        else {
+            await unfriend(body)
+                .then((results) => {
+                    return return_rt(res, 1, "unfriend success");
+                })
+                .catch((results) => {
+                    console.log(results);
+                    return return_rt(res, 0, "Database connection error");
+                });
+        }
+    },
+    blockUser: async function(req, res) {
+        const body = req.body;
+
+        if (body.sender_id == undefined || body.receiver_id == undefined)
+            return return_rt(res, 0, "some inputs are none");
+
+        const user1 = await getUserById(body.sender_id);
+        const user2 = await getUserById(body.receiver_id);
+        if (!user1) return return_rt(res, 0, "user_id " + body.sender_id + " is not exist");
+        if (!user2) return return_rt(res, 0, "user_id " + body.receiver_id + " is not exist");
+
+        body.user1_id = body.sender_id;
+        body.user2_id = body.receiver_id;
+
+        const hasRelationship = await checkRelationship(body);
+        if (hasRelationship) {
+            if (hasRelationship.status == "block") return return_rt(res, 0, "has been already blocked");
+            else {
+                await updateBlockUser(body)
+                    .then((results) => {
+                        return return_rt(res, 1, "block success");
+                    })
+                    .catch((results) => {
+                        console.log(results);
+                        return return_rt(res, 0, "Database connection error");
+                    });
+            }
+        } else {
+            await createBlockUser(body)
+                .then((results) => {
+                    return return_rt(res, 1, "block success");
+                })
+                .catch((results) => {
+                    console.log(results);
+                    return return_rt(res, 0, "Database connection error");
+                });
+        }
+    }
 }
