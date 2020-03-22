@@ -92,6 +92,6 @@ describe('createUser', async() => {
             })
     });
     after(async() => {
-        await model.registeration.truncate();
+        await model.registeration.destroy({ truncate: { cascade: true } });
     });
 });

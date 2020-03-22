@@ -138,6 +138,23 @@ const updateBlockUser = (body) => {
     })
 }
 
+const unBlock = (body) => {
+    return new Promise((resolve, reject) => {
+        pool.user_relationship.destroy({
+                where: {
+                    [Op.or]: [{
+                        sender_id: body.sender_id,
+                        receiver_id: body.receiver_id
+                    }]
+                }
+            })
+            .then((result) => {
+                return resolve(result);
+            }).catch((error) => {
+                return reject(error);
+            });
+    })
+}
 module.exports = {
     checkRelationship,
     exactCheckRelationship,
@@ -145,5 +162,6 @@ module.exports = {
     replyFriend,
     unfriend,
     createBlockUser,
-    updateBlockUser
+    updateBlockUser,
+    unBlock
 }

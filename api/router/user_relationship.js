@@ -3,7 +3,8 @@ const {
     friendRequest,
     replyFriend,
     unfriend,
-    blockUser
+    blockUser,
+    unBlock
 } = require("../../backend/controller/user_relationship");
 
 const { checktoken } = require("../../backend/controller/token_validation");
@@ -17,5 +18,6 @@ router.put("/replyFriend", replyFriend);
 router.put("/block", blockUser);
 
 router.delete("/unfriend", unfriend);
+router.delete("/unblock", unBlock);
 
 module.exports = router;

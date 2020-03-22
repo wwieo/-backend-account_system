@@ -5,18 +5,13 @@ const {
     replyFriend,
     unfriend,
     createBlockUser,
-    updateBlockUser
+    updateBlockUser,
+    unBlock
 } = require("../database/user_relationship");
 const {
     getUserById
 } = require("../database/users");
 const { return_rt } = require("./../controller/return_rt")
-
-//friend
-//unfriend
-//unchecked_friend
-//block
-//unblock
 
 module.exports = {
     checkRelationship: async function(req, res) {
@@ -172,5 +167,30 @@ module.exports = {
                     return return_rt(res, 0, "Database connection error");
                 });
         }
+    },
+    unBlock: async function(req, res) {
+        const body = req.body;
+
+        if (body.sender_id == undefined || body.receiver_id == undefined)
+            return return_rt(res, 0, "some inputs are none");
+
+        const user1 = await getUserById(body.sender_id);
+        const user2 = await getUserById(body.receiver_id);
+        if (!user1) return return_rt(res, 0, "user_id " + body.sender_id + " is not exist");
+        if (!user2) return return_rt(res, 0, "user_id " + body.receiver_id + " is not exist");
+
+        const request = await exactCheckRelationship(body);
+        if (!request) return return_rt(res, 0, "they don't have relationship or sender and receiver is opposite");
+
+        if (request.status == "block") {
+            await unBlock(body)
+                .then((results) => {
+                    return return_rt(res, 1, "unblock success");
+                })
+                .catch((results) => {
+                    console.log(results);
+                    return return_rt(res, 0, "Database connection error");
+                });
+        } else return return_rt(res, 0, "status is not block");
     }
 }
