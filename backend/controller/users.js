@@ -10,6 +10,8 @@ const {
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { return_rt } = require("./../controller/return_rt")
 const { sign } = require("jsonwebtoken");
+const { checktoken } = require("../../backend/controller/token_validation");
+
 
 module.exports = {
     createUser: async function(req, res) {
@@ -45,9 +47,12 @@ module.exports = {
         const body = req.body;
 
         if (body.user_name == undefined) return return_rt(res, 0, "Need to input user_name");
-
         const userName = await getUserByUserName(body.user_name);
         if (!userName) return return_rt(res, 0, "No user record");
+
+        const userToken = await checktoken(req);
+        if (userToken != body.user_name) return return_rt(res, 0, "Access denied, unauthorize user");
+
         if (body.name == undefined) body.name = userName.name;
         if (body.email == undefined) body.email = userName.email;
 
@@ -69,13 +74,17 @@ module.exports = {
     updateUserPassword: async function(req, res) {
         const body = req.body;
         const salt = genSaltSync(10);
-
         if (body.old_password == undefined ||
             body.new_password == undefined ||
             body.user_name == undefined)
             return return_rt(res, 0, "Some inputs are none");
+
         const userName = await getUserByUserName(body.user_name);
         if (!userName) return return_rt(res, 0, "No user record");
+
+        const userToken = await checktoken(req);
+        if (userToken != body.user_name) return return_rt(res, 0, "Access denied, unauthorize user");
+
         const userId = await getUserById(userName.id);
         const result = await compareSync(body.old_password, userId.password);
         if (!result) return return_rt(res, 0, "Old password is different");

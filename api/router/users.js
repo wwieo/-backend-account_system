@@ -16,7 +16,7 @@ router.get("/:user_name", getUserByUserName);
 router.post("/", createUser);
 router.post("/login", login);
 
-router.put("/", checktoken, updateUser);
-router.put("/pw", checktoken, updateUserPassword);
+router.put("/", updateUser); //token
+router.put("/pw", updateUserPassword); //token
 
 module.exports = router;

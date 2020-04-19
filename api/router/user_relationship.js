@@ -1,4 +1,5 @@
 const {
+    getUserFriends,
     checkRelationship,
     friendRequest,
     replyFriend,
@@ -10,6 +11,7 @@ const {
 const { checktoken } = require("../../backend/controller/token_validation");
 const router = require("express").Router();
 
+router.get("/userFriends", getUserFriends);
 router.get("/check", checkRelationship);
 
 router.post("/friendRequest", friendRequest);

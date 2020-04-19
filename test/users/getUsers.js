@@ -12,6 +12,8 @@ describe('getUsers', async() => {
             })
     });
     after(async() => {
-        await model.registeration.destroy({ truncate: { cascade: true } });
+        await model.query('SET FOREIGN_KEY_CHECKS = 0')
+        await model.query('truncate table registeration')
+        await model.query('SET FOREIGN_KEY_CHECKS = 1')
     });
 });

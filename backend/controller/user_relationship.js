@@ -1,4 +1,5 @@
 const {
+    getUserFriends,
     checkRelationship,
     exactCheckRelationship,
     friendRequest,
@@ -14,6 +15,24 @@ const {
 const { return_rt } = require("./../controller/return_rt")
 
 module.exports = {
+    getUserFriends: async function(req, res) {
+        const body = req.body;
+
+        if (body.user_id == undefined)
+            return return_rt(res, 0, "some inputs are none");
+
+        const user = await getUserById(body.user_id);
+        if (!user) return return_rt(res, 0, "user is not exist");
+
+        await getUserFriends(body)
+            .then((results) => {
+                return return_rt(res, 1, results);
+            })
+            .catch((results) => {
+                console.log(results);
+                return return_rt(res, 0, "Database connection error");
+            });
+    },
     checkRelationship: async function(req, res) {
         const body = req.body;
 

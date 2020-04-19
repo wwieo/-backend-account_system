@@ -1,6 +1,34 @@
 const pool = require("../../model/index.js");
 const { Op } = require("sequelize");
 
+const getUserFriends = (body) => {
+    return new Promise((resolve, reject) => {
+        pool.user_relationship.findAll({
+                attributes: [
+                    "sender_id",
+                    "receiver_id"
+                ]
+            }, {
+                where: {
+                    [Op.or]: [{
+                            sender_id: body.user_id,
+                            status: "friend"
+                        },
+                        {
+                            receiver_id: body.user_id,
+                            status: "friend"
+                        }
+                    ]
+                }
+            })
+            .then((result) => {
+                return resolve(result);
+            }).catch((error) => {
+                return reject(error);
+            });
+    })
+}
+
 const checkRelationship = (body) => {
     return new Promise((resolve, reject) => {
         pool.user_relationship.findOne({
@@ -156,6 +184,7 @@ const unBlock = (body) => {
     })
 }
 module.exports = {
+    getUserFriends,
     checkRelationship,
     exactCheckRelationship,
     friendRequest,

@@ -2,17 +2,17 @@ const { verify } = require("jsonwebtoken")
 const { return_rt } = require("./../controller/return_rt")
 
 module.exports = {
-    checktoken: (req, res, next) => {
+    checktoken: (req) => {
         let token = req.get("authorization");
         if (token) {
             token = token.slice(7);
-            verify(token, "qwe1234", (err, decoded) => {
+            return verify(token, "qwe1234", (err, decoded) => {
                 if (err)
-                    return return_rt(res, 0, "invalid token");
+                    return "Access denied, unauthorize user";
                 else
-                    next();
+                    return decoded["result"].user_name;
             })
         } else
-            return return_rt(res, 0, "Access denied, unauthorize user");
+            return "Access denied, unauthorize user";
     }
 }

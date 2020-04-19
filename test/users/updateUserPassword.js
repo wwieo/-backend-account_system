@@ -102,7 +102,24 @@ describe('updateUserPassword', async() => {
                 done();
             });
     });
+    await it('Invalid token', (done) => {
+        chai.request(app)
+            .put('/api/users/pw')
+            .set('Authorization', 'Bearer ' + "invalid token")
+            .send({
+                "user_name": "upUserPW",
+                "old_password": "upUserPWInvalid",
+                "new_password": "upUserPWAgo"
+            })
+            .end((err, res) => {
+                if (err) console.log(err);
+                expect(res.body).to.deep.equal({ success: 0, results: "Access denied, unauthorize user" });
+                done();
+            });
+    });
     after(async() => {
-        await model.registeration.destroy({ truncate: { cascade: true } });
+        await model.query('SET FOREIGN_KEY_CHECKS = 0')
+        await model.query('truncate table registeration')
+        await model.query('SET FOREIGN_KEY_CHECKS = 1')
     });
 });
