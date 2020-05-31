@@ -1,14 +1,10 @@
 const pool = require("../../model/index.js");
 const { Op } = require("sequelize");
 
+//need be fixed
 const getUserFriends = (body) => {
     return new Promise((resolve, reject) => {
         pool.user_relationship.findAll({
-                attributes: [
-                    "sender_id",
-                    "receiver_id"
-                ]
-            }, {
                 where: {
                     [Op.or]: [{
                             sender_id: body.user_id,

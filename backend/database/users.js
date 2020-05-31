@@ -1,4 +1,5 @@
 const pool = require("../../model/index.js");
+const { Op } = require("sequelize");
 
 const create = data => {
     return new Promise((resolve, reject) => {
@@ -127,11 +128,41 @@ const updateUserPassword = data => {
     })
 }
 
+const getUserByFuzzy = data => {
+    return new Promise((resolve, reject) => {
+        pool.registeration.findAll({
+            where: {
+                [Op.or]: [{
+                        name: {
+                            [Op.like]: '%' + data + '%'
+                        }
+                    },
+                    {
+                        user_name: {
+                            [Op.like]: '%' + data + '%'
+                        }
+                    }
+                ]
+            },
+            attributes: [
+                "name",
+                "user_name"
+            ],
+            limit: 10
+        }).then((user) => {
+            return resolve(user);
+        }).catch((error) => {
+            return reject(error);
+        });
+    });
+}
+
 module.exports = {
     create,
     getUserByUserName,
     getUserByEmail,
     getUserById,
+    getUserByFuzzy,
     getUsers,
     updateUser,
     updateUserPassword

@@ -5,7 +5,8 @@ const {
     getUsers,
     getUserByEmail,
     getUserByUserName,
-    getUserById
+    getUserById,
+    getUserByFuzzy
 } = require("../database/users");
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { return_rt } = require("./../controller/return_rt")
@@ -121,6 +122,17 @@ module.exports = {
             .catch((results) => {
                 console.log(results);
                 return return_rt(res, 0, "getUserByUserName api error");
+            })
+    },
+    getUserByFuzzy: (req, res) => {
+        const data = req.body.string;
+        getUserByFuzzy(data)
+            .then((results) => {
+                return return_rt(res, 1, results);
+            })
+            .catch((results) => {
+                console.log(results);
+                return return_rt(res, 0, "getUserByFuzzy api error");
             })
     },
     login: async function(req, res) {
