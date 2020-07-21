@@ -1,5 +1,5 @@
 const { chai, expect, app, model } = require("../index.js");
-
+/*
 before(async() => {
     await model.registeration.create({
         "user_name": "user01",
@@ -31,7 +31,7 @@ before(async() => {
         "status": "block"
     });
 });
-
+*/
 /*
 describe('getUserFriends', async() => {
     await it('Get User Friends', (done) => {
