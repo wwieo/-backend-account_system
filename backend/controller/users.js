@@ -8,13 +8,37 @@ const {
     getUserById,
     getUserByFuzzy
 } = require("../database/users");
-const { genSaltSync, hashSync, compareSync } = require("bcrypt");
+const { genSaltSync, hashSync, compareSync }    = require("bcrypt");
 const { return_rt } = require("./../controller/return_rt")
 const { sign } = require("jsonwebtoken");
 const { checktoken } = require("../../backend/controller/token_validation");
 
 
 module.exports = {
+    checkExistByUserName: async function(req, res){
+        const user_name = req.params.user_name;
+        getUserByUserName(user_name)
+        .then((results) => {
+            if (results) return return_rt(res, 1, true);
+            else return return_rt(res, 1, false);
+        })
+        .catch((results) => {
+            console.log(results);
+            return return_rt(res, 0, "checkExistByUserName api error");
+        })
+    },
+    checkExistByEmail: async function(req, res){
+        const email = req.params.email;
+        getUserByEmail(email)
+        .then((results) => {
+            if (results) return return_rt(res, 1, true);
+            else return return_rt(res, 1, false);
+        })
+        .catch((results) => {
+            console.log(results);
+            return return_rt(res, 0, "checkExistByEmail api error");
+        })
+    },
     createUser: async function(req, res) {
         const body = req.body;
         const salt = genSaltSync(10);
@@ -165,16 +189,15 @@ module.exports = {
 
 function checkLength(res, body) {
     if (body.name || body.name == "") {
-        if (body.name.length < 1 || body.name == "") return return_rt(res, 0, "user_name's length need be more than 0");
-        else if (body.name.length > 12) return return_rt(res, 0, "user_name's length need be less than 12");
+        if (body.name.length < 1 || body.name == "") return return_rt(res, 0, "name's length need be more than 0");
+        else if (body.name.length > 24) return return_rt(res, 0, "name's length need be less than 25");
     }
     if (body.user_name || body.user_name == "") {
-        if (body.user_name.length <= 3 || body.user_name == "") return return_rt(res, 0, "user_name's length need be more than 3");
-        else if (body.user_name.length > 12) return return_rt(res, 0, "user_name's length need be less than 12");
+        if (body.user_name.length < 4 || body.user_name == "") return return_rt(res, 0, "user_name's length need be more than 3");
+        else if (body.user_name.length > 24) return return_rt(res, 0, "user_name's length need be less than 25");
     }
     if (body.password || body.password == "") {
         if (body.password.length <= 5 || body.password == "") return return_rt(res, 0, "password's length need be more than 5");
-        else if (body.password.length > 12) return return_rt(res, 0, "password's length need be less than 12");
     }
     return 0;
 }

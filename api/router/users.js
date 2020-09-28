@@ -1,4 +1,6 @@
 const {
+    checkExistByUserName,
+    checkExistByEmail,
     createUser,
     updateUser,
     updateUserPassword,
@@ -14,7 +16,8 @@ const router = require("express").Router();
 router.get("/", getUsers);
 router.get("/fuzzy", getUserByFuzzy);
 router.get("/:user_name", getUserByUserName);
-
+router.get("/exist_user_name/:user_name", checkExistByUserName);
+router.get("/exist_email/:email", checkExistByEmail);
 
 router.post("/", createUser);
 router.post("/login", login);
