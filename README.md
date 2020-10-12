@@ -34,11 +34,64 @@ Then you can run this project by the command below:
 node app.js
 ```
   
-api router list is in app.js & ./api/router/   
-  
-The complete backend api should be:  
-(your_host):(your_app_port)/api/(app.js_router)/(function router you want to use)  
-  
-e.g:  
-If I want to get a user data, I can use:  
-[Get] localhost:3000/api/users/:user_name
+## API List
+
+Now you can use account and friend system api:  
+We will use localhost(your_host) and 3000(your_host) to present our example.  
+Your request should package for a json format if needed.  
+
+### Account system
+
+**URL = localhost:3000/api/users**
+User includes id, user_name, name, email and password.  
+* Get all users' data
+    * [GET] URL/
+* Get a user's data by user_name
+    * [GET] URL/:user_name
+* Check a user if exists by user_name
+    * [GET] URL/exist_user_name/:user_name
+* Check a user if exists by email
+    * [GET] URL/exist_email/:email
+* Create a user
+    * [POST] URL/
+    * Json includes user_name, name, email and password.
+* Login
+    * [POST] URL/login
+    * Json includes user_name or email, and password.
+    * Result will return a token if success login.
+* Update a user data
+    * [PUT] URL/
+    * Need a token to update.
+    * Json only includes values which need to be update.
+    * Only can update email and name.
+* Update a user's password
+    * [PUT] URL/pw
+    * Need a token to update.
+    * Json includes old_password, new_password and user_name.
+
+### Friend system
+
+**URL = localhost:3000/api/relationship**
+User relationship includes sender_id, receiver_id and status.
+Friend system is still in developing, so there's no need token to send.
+* Get a user's all friends
+    * [GET] URL/userFriends
+    * Json includes user_id
+* Check 2 user's relationship
+    * [GET] URL/check
+    * Json includes user1_id and user2_id
+* Send a friend request
+    * [POST] URL/friendRequest
+    * Json includes sender_id and receiver_id
+* Reply a friend request
+    * [PUT] URL/replyFriend
+    * Json includes sender_id(friend request sender) and receiver_id
+* Block a user
+    * [PUT] URL/block
+    * Json includes sender_id(block request sender) and receiver_id
+* Unfriend a user
+    * [DELETE] URL/unfriend
+    * Json includes user1_id and user2_id
+* Unblock a user
+    * [DELETE] URL/unblock
+    * Json includes sender_id(block request sender) and receiver_id
