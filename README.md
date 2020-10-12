@@ -6,7 +6,7 @@ Friend system: friend/check/block/unfriend
 
 ## To do list
 
-### 1) Add .env file, which needs communicate with MYSQL
+#### 1) Add .env file, which needs communicate with MYSQL
 
 * .env file includes:
     * DB_PORT= (database port you want to set)
@@ -15,7 +15,7 @@ Friend system: friend/check/block/unfriend
     * DB_PASS= (MYSQL password)
     * APP_PORT= (this project's port you want to set)
 
-### 2) Something should be install
+#### 2) Something should be install
 
 * Create 2 databases in your MYSQL manually:
     * systemPractice: the main database this project runs.
