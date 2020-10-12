@@ -31,3 +31,4 @@ Then you can run this project by the command below:
 node app.js
 ```
 
+**The current version is in branch dev now.**
