@@ -41,8 +41,7 @@ We will use localhost(your_host) and 3000(your_host) to present our example.
 Your request should package for a json format if needed.  
 
 ### Account system
-
-**URL = localhost:3000/api/users**
+**URL = localhost:3000/api/users**  
 User includes id, user_name, name, email and password.  
 * Get all users' data
     * [GET] URL/
@@ -70,9 +69,8 @@ User includes id, user_name, name, email and password.
     * Json includes old_password, new_password and user_name.
 
 ### Friend system
-
-**URL = localhost:3000/api/relationship**
-User relationship includes sender_id, receiver_id and status.
+**URL = localhost:3000/api/relationship**  
+User relationship includes sender_id, receiver_id and status.  
 Friend system is still in developing, so there's no need token to send.
 * Get a user's all friends
     * [GET] URL/userFriends
@@ -95,3 +93,10 @@ Friend system is still in developing, so there's no need token to send.
 * Unblock a user
     * [DELETE] URL/unblock
     * Json includes sender_id(block request sender) and receiver_id
+
+If you want to run a unit test, run the command:  
+It will show you the whole test and test coverage.
+```
+npm run test
+```
+Note: There is only acoount system test from now on.
