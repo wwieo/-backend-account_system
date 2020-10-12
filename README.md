@@ -4,6 +4,8 @@
     * Account system: register/login/update data with token
     * Friend system: friend/check/block/unfriend
 
+**Notice: The current version is in branch dev now.**
+
 ## To do list
 
 #### 1) Add .env file, which needs communicate with MYSQL
@@ -30,5 +32,3 @@ Then you can run this project by the command below:
 ```
 node app.js
 ```
-
-**The current version is in branch dev now.**
