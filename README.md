@@ -1,8 +1,8 @@
 # Backend Account System
 
-With using restfulAPI, you can reach the function as like:
-Account system: register/login/update data with token
-Friend system: friend/check/block/unfriend
+* With using restfulAPI, you can reach the function as like:
+    * Account system: register/login/update data with token
+    * Friend system: friend/check/block/unfriend
 
 ## To do list
 
