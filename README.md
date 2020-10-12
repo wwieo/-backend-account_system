@@ -34,3 +34,12 @@ Then you can run this project by the command below:
 ```
 node app.js
 ```
+
+api router list is in app.js & ./api/router/
+
+The complete backend api should be:
+(your_host):(your_app_port)/api/(app.js_router)/(function router you want to use)
+
+e.g:
+If I want to get a user data, I can use:
+[Get] localhost:3000/api/users/:user_name
