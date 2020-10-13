@@ -1,8 +1,8 @@
 # Backend Account System
 
-**Notice: The current version is at branch dev now.**
+**Notice: The current version is on branch dev now.**
 
-* With using restfulAPI, you can reach the function as like:
+* With using restfulAPI, you can reach the functions as like:
     * Account system: register/login/update/find
     * Friend system: friend/check/block/unfriend/unblock
   
@@ -37,7 +37,7 @@ node app.js
 ## API List
 
 Now you can use account and friend system api:  
-We will use localhost(your_host) and 3000(your_host) to present our example.  
+We will use localhost(your_host) and 3000(your_port) to represent our example.  
 Your request should package for a json format if needed.  
 
 ### Account system
